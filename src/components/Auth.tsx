@@ -14,21 +14,19 @@ export default function Auth() {
   const handleLogic = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      password: "test1234",
     });
     if (error) alert(error.message);
-    else alert("Check your email for the login !");
+    else window.location.reload();
     setLoading(false);
   };
 
   return (
     <form
       onSubmit={handleLogic}
-      className="flex flex-col gap-2 p-4 border rounded-lg bg-white"
+      className="flex flex-col gap-2 p-4 border rounded-lg text-black bg-white"
     >
       <h3 className="font-bold">Login to your vault</h3>
       <input

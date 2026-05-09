@@ -77,7 +77,6 @@ export default async function DocumentList() {
                 </span>
               </div>
             </div>
-            <EditDoc doc={doc} />
           </div>
         </div>
       ))}
