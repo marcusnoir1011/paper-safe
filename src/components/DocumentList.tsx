@@ -36,13 +36,12 @@ export default async function DocumentList() {
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {documents.map((doc) => (
+      {docsWithUrls.map((doc) => (
         <div
           key={doc.id}
           className="p-4 border rounded-lg bg-white shadow-sm flex flex-col md:flex-row gap-6 justify-between"
         >
-          {/*Image Preview Side*/}
-          <div className="relative w-full md:w-48 h-48 bg-gray-100 rounded overflow-hidden shrink-0">
+          <div className="relative w-full md:w-48 md:h-48 bg-gray-100 rounded overflow-hidden shrink-0">
             {doc.signedUrl ? (
               <img
                 src={doc.signedUrl}
@@ -55,27 +54,42 @@ export default async function DocumentList() {
               </div>
             )}
           </div>
-          {/*List and edit Side*/}
-          <div className="grow">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-bold text-lg leading-tight">{doc.title}</h3>
-                <p>
-                  Due:{" "}
-                  <span className={!doc.due_date ? "italic" : "font-semibold"}>
-                    {doc.due_date || "Not set"}
-                  </span>
+          <div className="grow flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-start">
+                <h3 className="font-bold text-lg leading-tight truncate max-w-[150px]">
+                  {doc.title}
+                </h3>
+                <p className="text-xl font-mono font-bold text-blue-600">
+                  ¥{doc.total_amount?.toLocaleString() || "0"}
                 </p>
-                <span
-                  className={`text-xs px-2 py-1 rounded font-medium ${
-                    doc.is_paid
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {doc.is_paid ? "Paid" : "Unpaid"}
-                </span>
               </div>
+
+              <p className="text-sm mt-1">
+                Due:
+                <span
+                  className={
+                    !doc.due ? "italic text-gray-400" : "font-semibold"
+                  }
+                >
+                  {doc.due_date || "Not Set"}
+                </span>
+              </p>
+            </div>
+
+            <div className="mt-4 flex justify-between items-center">
+              <span
+                className={`text-xsa px-2 py-1 rounded font-medium ${
+                  doc.is_paid
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {doc.is_paid ? "Paid" : "Unpaid"}
+              </span>
+
+              {/*buttons */}
+              <EditDoc document={doc} />
             </div>
           </div>
         </div>
