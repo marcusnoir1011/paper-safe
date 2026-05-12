@@ -1,12 +1,15 @@
-import Auth from "@/components/Auth";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import { Ghost, PlusCircle, LayoutList } from "lucide-react";
+
+import Auth from "@/components/Auth";
 import UploadDoc from "@/components/UploadDoc";
 import DocumentList from "@/components/DocumentList";
 
 export default async function Home() {
   const cookieStore = await cookies();
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -25,31 +28,46 @@ export default async function Home() {
 
   if (!user) {
     return (
-      <main className="flex items-center justify-center min-h-screen bg-gray-100">
+      <main className="grid place-items-center min-h-screen bg-slate-50">
         <Auth />
       </main>
     );
   }
   return (
-    <main className="min-h-screen p-12 bg-gray-50">
-      <div className="max-w-2xl mx-auto space-y-8">
-        <h1 className="text-3xl font-bold text-gray-900 text-center">
-          My Anxiety vault
-        </h1>
-        <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">
-            Upload New Bill Document
-          </h2>
-          <UploadDoc />
-        </section>
+    <main className="max-w-xl mx-auto py-12 px-6 space-y-12">
+      <header className="flex items-center gap-3">
+        <div className="bg-blue-400 p-2 rounded–lg">
+          <Ghost className="text-white" size={32} />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            My Anxiety vault
+          </h1>
+          <p className="text-xs text-slate-500 font-medium">
+            Keep those Japanese bills in check!
+          </p>
+        </div>
+      </header>
 
-        <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+      <section className="space-y-3">
+        <div className="flex items-center gap-2 text-slate-400">
+          <PlusCircle size={18} />
+          <h2 className="text-xs font-semibold uppercase tracking-wider">
+            Upload
+          </h2>
+        </div>
+        <UploadDoc />
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center gap-2 text-slate-400">
+          <LayoutList size={18} />
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
             Recent Documents
           </h2>
-          <DocumentList />
-        </section>
-      </div>
+        </div>
+        <DocumentList />
+      </section>
     </main>
   );
 }

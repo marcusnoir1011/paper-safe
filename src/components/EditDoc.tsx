@@ -1,20 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import { X, Calendar, DollarSign, CheckCircle2 } from "lucide-react";
+
+import { supabase } from "@/lib/client";
 
 export default function EditDoc({ document }: { document: any }) {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isPaid, setIsPaid] = useState(document.is_paid);
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
