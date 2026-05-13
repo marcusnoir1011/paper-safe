@@ -6,6 +6,7 @@ import { Ghost, PlusCircle, LayoutList } from "lucide-react";
 import Auth from "@/components/Auth";
 import UploadDoc from "@/components/UploadDoc";
 import DocumentList from "@/components/DocumentList";
+import DashboardStats from "@/components/DashboardStats";
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -22,6 +23,7 @@ export default async function Home() {
     },
   );
 
+  // auth
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -33,6 +35,21 @@ export default async function Home() {
       </main>
     );
   }
+
+  // data for dashboard
+  const { data: documents } = await supabase.from("documents").select("*");
+  const unpaidBills = documents?.filter((doc) => !doc.is_paid);
+  const totalUnpaidAmount = unpaidBills?.reduce(
+    (sum, doc) => sum + (doc.amount || 0),
+    0,
+  );
+  const overdueBills = unpaidBills?.filter((doc) => {
+    if (!doc.due_date) return false;
+    return new Date(doc.due_date) < new Date();
+  });
+  const overBillsCount = overdueBills?.length || 0;
+  const paidBillCount = documents?.filter((doc) => doc.is_paid).length;
+
   return (
     <main className="max-w-xl mx-auto py-12 px-6 space-y-12">
       <header className="flex items-center gap-3">
@@ -57,6 +74,14 @@ export default async function Home() {
           </h2>
         </div>
         <UploadDoc />
+      </section>
+
+      <section className="space-y-3">
+        <DashboardStats
+          totalUnpaidAmount={totalUnpaidAmount}
+          overdueDateCount={overBillsCount}
+          paidBillCount={paidBillCount}
+        />
       </section>
 
       <section className="space-y-3">

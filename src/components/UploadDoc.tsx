@@ -14,8 +14,11 @@ import {
 import { supabase } from "@/lib/client";
 import { recognizeReceipt } from "@/lib/tesseract";
 import { parseJpBill } from "@/utility/parseJpBill";
+import { useRouter } from "next/navigation";
 
 export default function UploadDoc() {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -53,7 +56,9 @@ export default function UploadDoc() {
         title: file.name,
         image_path: filePath,
         category: "Unsorted",
-        amount: extractedAmount ? parseInt(extractedAmount) : 0,
+        amount: extractedAmount
+          ? parseInt(extractedAmount.replace(/, /g, ""))
+          : 0,
         due_date: extractedDate || null,
         is_paid: false,
       });
@@ -61,6 +66,7 @@ export default function UploadDoc() {
     } catch (error: any) {
       alert(error.message);
     } finally {
+      router.refresh();
       setLoading(false);
     }
   };
@@ -141,7 +147,7 @@ export default function UploadDoc() {
               <p>{dueDate || "Not Set"}</p>
             </div>
           </div>
-          <div>
+          <div className="bg-green-50/50 p-4 flex items-center justify-center border-t border-slate-100">
             <CheckCircle2 size={14} className="text-green-600" />
             <span className="text-xs font-medium text-green-700">
               Ready to save
