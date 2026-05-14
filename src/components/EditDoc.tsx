@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Calendar, DollarSign, CheckCircle2 } from "lucide-react";
+import { X, CheckCircle2 } from "lucide-react";
 
 import { supabase } from "@/lib/client";
 
@@ -37,7 +37,7 @@ export default function EditDoc({ document }: { document: any }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+        className="px-4 py-2 text-xs font-medium text-slate-600 bg-surface border border-border-mid rounded-md hover:bg-slate-50 hover:border-slate-400 transition-all shadow-sm"
       >
         Edit
       </button>
@@ -51,14 +51,14 @@ export default function EditDoc({ document }: { document: any }) {
           />
 
           {/* Modal Window */}
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-between p-5 border-b border-slate-100">
-              <h2 className="text-lg font-semibold text-slate-800">
+          <div className="relative bg-surface rounded-2xl shadow-xl w-full max-w-sm border border-border-light overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-border-light bg-slate-50/50">
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-tight">
                 Edit Document
               </h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+                className="p-2 rounded-full hover:bg-slate-200 text-slate-400 transition-colors"
               >
                 <X size={20} />
               </button>
@@ -66,8 +66,8 @@ export default function EditDoc({ document }: { document: any }) {
 
             <form onSubmit={handleUpdate} className="p-6 space-y-5">
               {/* Due Date Field */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="space-y-3">
+                <label className="font-mono text-[10px] font-medium text-muted uppercase tracking-widest">
                   Due Date
                 </label>
                 <div className="relative">
@@ -75,18 +75,18 @@ export default function EditDoc({ document }: { document: any }) {
                     name="due_date"
                     type="date"
                     defaultValue={document.due_date}
-                    className="w-full pl-3 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    className="w-full px-4 py-2 bg-white border border-border-mid rounded-lg text-sm focus:ring-1 focus:ring-ink focus:border-ink outline-none transition-all"
                   />
                 </div>
               </div>
 
               {/* Amount Field */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="space-y-3">
+                <label className="font-mono text-[10px] font-medium text-muted uppercase tracking-widest">
                   Amount
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-mono">
                     ¥
                   </span>
                   <input
@@ -94,13 +94,13 @@ export default function EditDoc({ document }: { document: any }) {
                     type="number"
                     placeholder="0.00"
                     defaultValue={document.amount}
-                    className="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    className="w-full pl-8 pr-3 py-2 bg-white border border-border-mid rounded-lg text-sm focus:ring-1 focus:ring-ink focus:border-ink outline-none transition-all"
                   />
                 </div>
               </div>
 
               {/* Status Toggle */}
-              <label className="flex items-center group cursor-pointer p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
+              <label className="flex items-center group cursor-pointer p-4 bg-slate-50 rounded-xl border border-border-light hover:border-border-mid transition-colors">
                 <input
                   type="checkbox"
                   checked={isPaid}
@@ -108,13 +108,13 @@ export default function EditDoc({ document }: { document: any }) {
                   className="peer hidden"
                 />
                 <div
-                  className={`w-5 h-5 rounded border flex items-center justify-center transition-all
-                      ${isPaid ? "bg-green-500 border-green-500" : "bg-white border-slate-300"}`}
+                  className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all
+                      ${isPaid ? "bg-ink border-ink" : "bg-white border-border-mid"}`}
                 >
                   {isPaid && <CheckCircle2 size={14} className="text-white" />}
                 </div>
-                <span className="ml-3 text-sm font-medium text-slate-600 group-hover:text-slate-900">
-                  Mark as Paid
+                <span className="ml-4 text-xs font-bold text-slate-600 uppercase tracking-tight">
+                  {isPaid ? "Paid" : "Unpaid"}
                 </span>
               </label>
 
@@ -122,13 +122,13 @@ export default function EditDoc({ document }: { document: any }) {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors uppercase tracking-tight"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md shadow-blue-200 transition-all active:scale-95"
+                  className="flex-1 px-4 py-2 text-xs font-bold text-white bg-ink hover:bg-slate-800 rounded-lg shadow-sm transition-all active:scale-[0.98] uppercase tracking-tight"
                 >
                   Save Changes
                 </button>

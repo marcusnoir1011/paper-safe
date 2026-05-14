@@ -15,7 +15,7 @@ export function ImagePreview({ src, title }: { src: string; title: string }) {
         <img
           src={src}
           alt={title}
-          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+          className="object-cover w-full h-full rounded group-hover:scale-110 transition-transform duration-500"
         />
 
         <div className="absolute inset-0 bg-black/0 group-hover:bg-balck/20 transition-colors felx items-center justify-center">
