@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-import { Ghost, PlusCircle, LayoutList } from "lucide-react";
+import { Ghost, Paperclip, PlusCircle, LayoutList } from "lucide-react";
 
 import Auth from "@/components/Auth";
 import UploadDoc from "@/components/UploadDoc";
@@ -53,23 +53,23 @@ export default async function Home() {
   return (
     <main className="max-w-xl mx-auto py-12 px-6 space-y-12">
       <header className="flex items-center gap-3">
-        <div className="bg-blue-400 p-2 rounded–lg">
-          <Ghost className="text-white" size={32} />
+        <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light">
+          <Paperclip className="text-white" size={64} />
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            My Anxiety vault
+        <div className="flex flex-col justify-between self-stretch py-1.5">
+          <h1 className="font-sans text-4xl font-bold text-slate-900 tracking-tight">
+            Paper Safe
           </h1>
-          <p className="text-xs text-slate-500 font-medium">
+          <p className="font-mono text-md font-medium text-muted tracking-tighter">
             Keep those Japanese bills in check!
           </p>
         </div>
       </header>
 
       <section className="space-y-3">
-        <div className="flex items-center gap-2 text-slate-400">
-          <PlusCircle size={18} />
-          <h2 className="text-xs font-semibold uppercase tracking-wider">
+        <div className="flex items-center gap-3 text-slate-400">
+          <PlusCircle size={16} />
+          <h2 className="font-sans text-xs font-bold uppercase tracking-wider">
             Upload
           </h2>
         </div>
@@ -85,9 +85,9 @@ export default async function Home() {
       </section>
 
       <section className="space-y-3">
-        <div className="flex items-center gap-2 text-slate-400">
+        <div className="flex items-center gap-3 text-slate-400">
           <LayoutList size={18} />
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
+          <h2 className="font-sans text-sm font-bold text-slate-400 uppercase tracking-wider">
             Recent Documents
           </h2>
         </div>

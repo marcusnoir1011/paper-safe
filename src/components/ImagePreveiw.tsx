@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Maximize, Maximize2 } from "lucide-react";
+import { X, Maximize2 } from "lucide-react";
 
 export function ImagePreview({ src, title }: { src: string; title: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
