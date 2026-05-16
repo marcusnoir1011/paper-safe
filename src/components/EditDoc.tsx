@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { X, CheckCircle2 } from "lucide-react";
 
 import { supabase } from "@/lib/client";
+import toast from "react-hot-toast/headless";
 
 export default function EditDoc({ document }: { document: any }) {
   const router = useRouter();
@@ -27,10 +28,10 @@ export default function EditDoc({ document }: { document: any }) {
       .eq("id", document.id);
 
     if (error) {
-      alert("Error updating: " + error.message);
+      toast.error(error?.message);
     } else {
       router.refresh();
-      alert("Updated successfull!");
+      toast.success("Successfully Edited!");
     }
   };
   return (

@@ -1,12 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-import { Ghost, Paperclip, PlusCircle, LayoutList } from "lucide-react";
+import { Paperclip, PlusCircle, LayoutList } from "lucide-react";
 
 import Auth from "@/components/Auth";
 import UploadDoc from "@/components/UploadDoc";
 import DocumentList from "@/components/DocumentList";
 import DashboardStats from "@/components/DashboardStats";
+import NotificationReminder from "@/components/NotificationReminder";
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -38,7 +39,8 @@ export default async function Home() {
 
   // data for dashboard
   const { data: documents } = await supabase.from("documents").select("*");
-  const unpaidBills = documents?.filter((doc) => !doc.is_paid);
+  const safeDocuments = documents || [];
+  const unpaidBills = safeDocuments?.filter((doc) => !doc.is_paid);
   const totalUnpaidAmount = unpaidBills?.reduce(
     (sum, doc) => sum + (doc.amount || 0),
     0,
@@ -48,21 +50,27 @@ export default async function Home() {
     return new Date(doc.due_date) < new Date();
   });
   const overBillsCount = overdueBills?.length || 0;
-  const paidBillCount = documents?.filter((doc) => doc.is_paid).length;
+  const paidBillCount = safeDocuments?.filter((doc) => doc.is_paid).length;
 
   return (
     <main className="max-w-xl mx-auto py-12 px-6 space-y-12">
-      <header className="flex items-center gap-3">
-        <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light">
-          <Paperclip className="text-white" size={64} />
+      <header className="flex items-center justify-between w-full border border-border-light p-4 rounded-2xl shadow-sm gap-3">
+        <div className="flex items-center gap-3">
+          <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light shrink-0">
+            <Paperclip className="text-white" size={48} />
+          </div>
+          <div className="flex flex-col justify-between self-stretch py-1">
+            <h1 className="font-sans text-4xl font-bold text-slate-900 tracking-tight leading-none">
+              Paper Safe
+            </h1>
+            <p className="font-mono text-md font-medium text-muted tracking-tighter">
+              Keep those Japanese bills in check!
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col justify-between self-stretch py-1.5">
-          <h1 className="font-sans text-4xl font-bold text-slate-900 tracking-tight">
-            Paper Safe
-          </h1>
-          <p className="font-mono text-md font-medium text-muted tracking-tighter">
-            Keep those Japanese bills in check!
-          </p>
+
+        <div className="shrink-0">
+          <NotificationReminder documents={safeDocuments} />
         </div>
       </header>
 

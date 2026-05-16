@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Key, Loader2, Paperclip } from "lucide-react";
 
 import { supabase } from "@/lib/client";
+import toast from "react-hot-toast/headless";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ export default function Auth() {
       password: "test1234", // emailRedirectTo: `${window.location.origin}/auth/callback`
     });
 
-    if (error) alert(error.message);
+    if (error) toast.error(error.message);
     else window.location.reload();
 
     setLoading(false);
@@ -27,8 +28,8 @@ export default function Auth() {
   return (
     <div className="w-ful max-w-sm space-y-6">
       <div className="flex flex-col items-center text-center space-y-3">
-        <div className="p-4 bg-surface rounded-2xl shadow-sm border border-border-light">
-          <Key className="text-ink" size={64} />
+        <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light">
+          <Paperclip className="text-white" size={64} />
         </div>
         <h3 className="font-sans text-xl font-bold text-slate-900 uppercase tracking-tight">
           Welcome Back

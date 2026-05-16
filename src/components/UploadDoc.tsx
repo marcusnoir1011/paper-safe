@@ -15,6 +15,7 @@ import {
 import { supabase } from "@/lib/client";
 import { recognizeReceipt } from "@/lib/tesseract";
 import { parseJpBill } from "@/utility/parseJpBill";
+import toast from "react-hot-toast/headless";
 
 export default function UploadDoc() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function UploadDoc() {
       // ocr
       const tempUrl = URL.createObjectURL(file);
       const rawText = await recognizeReceipt(tempUrl);
+      console.log(rawText);
       const { extractedAmount, extractedDate } = parseJpBill(rawText);
 
       setAmount(extractedAmount);
@@ -56,9 +58,7 @@ export default function UploadDoc() {
         title: file.name,
         image_path: filePath,
         category: "Unsorted",
-        amount: extractedAmount
-          ? parseInt(extractedAmount.replace(/, /g, ""))
-          : 0,
+        amount: extractedAmount ? parseInt(extractedAmount) : 0,
         due_date: extractedDate || null,
         is_paid: false,
       });
@@ -66,8 +66,9 @@ export default function UploadDoc() {
 
       router.refresh();
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
+      toast.success("Uploaded Successfull!");
       setLoading(false);
     }
   };
