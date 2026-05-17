@@ -17,8 +17,20 @@ export default async function Home() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value;
+        // get(name) {
+        //   return cookieStore.get(name)?.value;
+        // },
+        getAll() {
+          return cookieStore
+            .getAll()
+            .map(({ name, value }) => ({ name, value }));
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {}
         },
       },
     },
@@ -63,8 +75,9 @@ export default async function Home() {
             <h1 className="font-sans text-4xl font-bold text-slate-900 tracking-tight leading-none">
               Paper Safe
             </h1>
-            <p className="font-mono text-md font-medium text-muted tracking-tighter">
-              Keep those Japanese bills in check!
+            <p className="font-mono text-sm font-medium mt-1 text-muted tracking-tighter">
+              Keep those Japanese bills
+              <br /> in check!
             </p>
           </div>
         </div>

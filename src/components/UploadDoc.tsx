@@ -12,10 +12,14 @@ import {
   JapaneseYen,
 } from "lucide-react";
 
-import { supabase } from "@/lib/client";
-import { recognizeReceipt } from "@/lib/tesseract";
-import { parseJpBill } from "@/utility/parseJpBill";
 import toast from "react-hot-toast/headless";
+
+import { supabase } from "@/lib/client";
+import { recognizeImage } from "@/lib/tesseract";
+import { parseJpBill } from "@/utility/parseJpBill";
+
+import CameraOcr from "./CameraOcr";
+import { extractEtag } from "next/dist/server/image-optimizer";
 
 export default function UploadDoc() {
   const router = useRouter();
@@ -32,7 +36,7 @@ export default function UploadDoc() {
 
       // ocr
       const tempUrl = URL.createObjectURL(file);
-      const rawText = await recognizeReceipt(tempUrl);
+      const rawText = await recognizeImage(tempUrl);
       console.log(rawText);
       const { extractedAmount, extractedDate } = parseJpBill(rawText);
 
@@ -75,58 +79,72 @@ export default function UploadDoc() {
 
   return (
     <div className="space-y-5">
-      <div className="relative group">
-        <input
-          type="file"
-          onChange={handleUpload}
-          disabled={loading}
-          className="hidden"
-          id="file-upload"
-          accept="image/*"
-        />
-        <label
-          htmlFor="file-upload"
-          className={`
-            flex flex-col items-center justify-center w-full py-12 px-4
-            border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-200
-            ${
-              loading
-                ? "bg-slate-50 border-border-mid cursor-wait"
-                : "bg-surface border-border-mid hover:border-ink hover:bg-slate-50/50"
-            }
-            `}
-        >
-          {loading ? (
-            <div className="flex flex-col items-center gap-5">
-              <Loader2 className="text-ink animate-spin" size={32} />
-              <div className="text-center">
-                <p className="text-sm font-bold text-slate-900 font-sans tracking-tight">
-                  Analyzing Document
-                </p>
-                <p className="font-mono text-[10px] text-muted mt-1 uppercase tracking-widest">
-                  Running Tesseract ORC...
-                </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Left */}
+        <div className="relative group h-full">
+          <input
+            type="file"
+            onChange={handleUpload}
+            disabled={loading}
+            className="hidden"
+            id="file-upload"
+            accept="image/*"
+          />
+          <label
+            htmlFor="file-upload"
+            className={`
+              flex flex-col items-center justify-center w-full py-12 px-4
+              border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-200
+              ${
+                loading
+                  ? "bg-slate-50 border-border-mid cursor-wait"
+                  : "bg-surface border-border-mid hover:border-ink hover:bg-slate-50/50"
+              }
+              `}
+          >
+            {loading ? (
+              <div className="flex flex-col items-center gap-5">
+                <Loader2 className="text-ink animate-spin" size={32} />
+                <div className="text-center">
+                  <p className="text-sm font-bold text-slate-900 font-sans tracking-tight">
+                    Analyzing Document
+                  </p>
+                  <p className="font-mono text-[10px] text-muted mt-1 uppercase tracking-widest">
+                    Running Tesseract ORC...
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-5">
-              <div className="p-4 bg-slate-100 text-ink rounded-full group-hover:scale-110 transition-transform duration-200">
-                <UploadCloud size={32} />
+            ) : (
+              <div className="flex flex-col items-center gap-5">
+                <div className="p-4 bg-slate-100 text-ink rounded-full group-hover:scale-110 transition-transform duration-200">
+                  <UploadCloud size={32} />
+                </div>
+                <div className="text-center">
+                  <p className="font-sans text-sm font-semibold text-slate-900">
+                    Drop Your Bill Here or{" "}
+                    <span className="text-ink underline underline-offset-4">
+                      browse
+                    </span>
+                  </p>
+                  <p className="font-mono text-[10px] text-muted mt-1 uppercase tracking-wider">
+                    PNG, JPG up to 10MB
+                  </p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="font-sans text-sm font-semibold text-slate-900">
-                  Drop Your Bill Here or{" "}
-                  <span className="text-ink underline underline-offset-4">
-                    browse
-                  </span>
-                </p>
-                <p className="font-mono text-[10px] text-muted mt-1 uppercase tracking-wider">
-                  PNG, JPG up to 10MB
-                </p>
-              </div>
-            </div>
-          )}
-        </label>
+            )}
+          </label>
+        </div>
+
+        {/* Right */}
+        <div className="border-2 border-dashed hover:border-ink border-border-mid rounded-3xl overflow-hidden bg-surface p-4 flex flex-col justify-center shadow-sm">
+          <CameraOcr
+            onSuccess={(extractedAmount, extractedDate) => {
+              setAmount(extractedAmount);
+              setDueDate(extractedDate);
+              toast.success("Live Scan Processing Complete!");
+            }}
+          />
+        </div>
       </div>
 
       {/*Preview*/}

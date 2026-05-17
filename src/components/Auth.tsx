@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-import { Key, Loader2, Paperclip } from "lucide-react";
+import { Loader2, Paperclip } from "lucide-react";
 
 import { supabase } from "@/lib/client";
 import toast from "react-hot-toast/headless";
