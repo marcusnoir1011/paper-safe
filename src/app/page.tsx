@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 import { Paperclip, PlusCircle, LayoutList } from "lucide-react";
 
-import Auth from "@/components/Auth";
+import Auth from "@/app/auth/page";
 import UploadDoc from "@/components/UploadDoc";
 import DocumentList from "@/components/DocumentList";
 import DashboardStats from "@/components/DashboardStats";
@@ -17,9 +17,6 @@ export default async function Home() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        // get(name) {
-        //   return cookieStore.get(name)?.value;
-        // },
         getAll() {
           return cookieStore
             .getAll()
