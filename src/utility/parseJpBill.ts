@@ -1,9 +1,11 @@
 export const parseJpBill = (text: string) => {
   // Clean up
   // 1. Normalize or standardize text
-  const standardizedText = text.replace(/[０-９]/g, (s) =>
+  let standardizedText = text.replace(/[０-９]/g, (s) =>
     String.fromCharCode(s.charCodeAt(0) - 0xfee0),
   );
+
+  standardizedText = standardizedText.replace(/(\d+)\s*,\s*(\d+)/g, "$1,$2");
 
   // 2. Remove Spaces
   const cleanText = standardizedText
