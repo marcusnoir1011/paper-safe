@@ -24,12 +24,15 @@ export function EmailPasswordForm() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          // REMOVED FOR NOW FOR BETA emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
       if (error) throw error;
-      toast.success("Check email to confirm registration!");
+      // toast.success("Check email to confirm registration!");
+      toast.success("Welcome! Account created successfully.");
+      router.push("/");
+      router.refresh();
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -46,6 +49,11 @@ export function EmailPasswordForm() {
         email,
         password,
       });
+      if (error) throw error;
+
+      toast.success("Signed in successfully.");
+      router.push("/");
+      router.refresh();
     } catch (err: any) {
       toast.error(err.message);
       router.refresh();
