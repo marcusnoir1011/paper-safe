@@ -8,9 +8,7 @@ export const parseJpBill = (text: string) => {
   standardizedText = standardizedText.replace(/(\d+)\s*,\s*(\d+)/g, "$1,$2");
 
   // 2. Remove Spaces
-  const cleanText = standardizedText
-    .split("\n")
-    .map((line) => line.replace(/\s+/g, ""));
+  const cleanText = standardizedText.split("\n").map((line) => line.trim());
 
   let foundAmount = "";
   let foundDate = "";
@@ -26,10 +24,10 @@ export const parseJpBill = (text: string) => {
     "対象金額",
   ];
 
-  for (const text of cleanText) {
+  for (const lineText of cleanText) {
     for (const word of amountKeywords) {
-      if (text.includes(word)) {
-        const numbertMatch = text.match(/(?:¥|￥|\\)?(\d[\d,]+)/);
+      if (lineText.includes(word)) {
+        const numbertMatch = lineText.match(/(?:¥|￥|\\)?\s*(\d[\d, ]*)/);
         if (numbertMatch) {
           const parsedNumber = numbertMatch[1].replace(/,/g, "");
 
@@ -45,13 +43,14 @@ export const parseJpBill = (text: string) => {
   }
 
   // 2. detect DATE
-  for (const text of cleanText) {
+  for (const lineText of cleanText) {
     const DateRegex = /(\d{4})[年/-](\d{1,2})[月/-](\d{1,2}|[a-zA-Z1-9]+)/;
-    const dateMatch = text.match(DateRegex);
+    const dateMatch = lineText.match(DateRegex);
 
     if (dateMatch) {
       const year = dateMatch[1];
       const month = dateMatch[2].padStart(2, "0");
+
       // clean up for day
       let dayRaw = dateMatch[3];
       let dayClean = dayRaw.replace(/\D/g, "");
