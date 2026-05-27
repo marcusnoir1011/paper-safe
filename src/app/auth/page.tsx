@@ -1,10 +1,12 @@
-"use client";
+("use client");
 import { useState } from "react";
 import { Loader2, Paperclip } from "lucide-react";
 import toast from "react-hot-toast/headless";
 
 import { MagicLinkForm } from "@/components/auth/MagicLinkForm";
 import { EmailPasswordForm } from "@/components/auth/EmailPasswordForm";
+
+export const dynamic = "force-dynamic";
 
 export default function Auth() {
   const [authMethod, setAuthMethod] = useState(true); // true for magic, false for email-password

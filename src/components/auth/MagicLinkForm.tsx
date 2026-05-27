@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import toast from "react-hot-toast/headless";
 
 import { supabase } from "@/lib/client";
 
 export function MagicLinkForm() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
@@ -25,6 +28,8 @@ export function MagicLinkForm() {
       });
 
       if (error) throw error;
+      router.refresh();
+      router.push("/");
     } catch (error: any) {
       toast.error(error.message || "Something went wrong.");
     } finally {

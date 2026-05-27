@@ -9,6 +9,8 @@ import DocumentList from "@/components/DocumentList";
 import DashboardStats from "@/components/DashboardStats";
 import NotificationReminder from "@/components/NotificationReminder";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const cookieStore = await cookies();
 

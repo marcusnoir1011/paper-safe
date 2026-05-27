@@ -31,8 +31,8 @@ export function EmailPasswordForm() {
       if (error) throw error;
       // toast.success("Check email to confirm registration!");
       toast.success("Welcome! Account created successfully.");
-      router.push("/");
       router.refresh();
+      router.push("/");
     } catch (err: any) {
       toast.error(err.message);
     } finally {
