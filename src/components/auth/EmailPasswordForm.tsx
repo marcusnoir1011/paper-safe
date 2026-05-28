@@ -13,7 +13,10 @@ export function EmailPasswordForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isSignUp, setIsSignUp] = useState<boolean>(false);
+
+  const buttonText = isSignUp ? "Sign Up" : "Sign In";
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,8 +43,7 @@ export function EmailPasswordForm() {
     }
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSignIn = async () => {
     setLoading(true);
 
     try {
@@ -62,9 +64,23 @@ export function EmailPasswordForm() {
     }
   };
 
+  const handleForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSignIn();
+
+    if (isSignUp) {
+      console.log("Registering new user...");
+    } else {
+      console.log("Logging existing user in...");
+    }
+  };
+
   return (
-    <form className="space-y-4">
+    <form onSubmit={handleForm} className="space-y-4">
       <div className="space-y-3">
+        <h2 className="font-sans text-3xl font-bold text-center text-ink tracking-tight">
+          {isSignUp ? "Create your Paper Safe" : "Sign In to Paper Safe"}
+        </h2>
         <div className="space-y-1">
           <label className="font-mono text-xs font-medium text-slate-500 uppercase tracking-wider">
             Email Address
@@ -94,20 +110,23 @@ export function EmailPasswordForm() {
         </div>
 
         <button
-          type="button"
+          type="submit"
           disabled={loading}
-          onClick={handleSignIn}
           className="w-full font-sans bg-ink text-white p-4 rounded-xl font-bold text-md hover:bg-slate-800 transition-colors flex items-center gap-2 disabled:opacity-70"
         >
-          {loading ? <Loader2 className="animate-spin" size={18} /> : "Sign In"}
+          {loading ? (
+            <Loader2 className="animate-spin" size={18} />
+          ) : (
+            buttonText
+          )}
         </button>
         <button
           type="button"
           disabled={loading}
-          onClick={handleSignUp}
+          onClick={() => setIsSignUp(!isSignUp)}
           className="w-full font-sans border border-border-mid text-slate-700 p-3 rounded-xl font-semibold text-xs hover:bg-slate-50 transition-colors block text-center"
         >
-          Create an account instead
+          {isSignUp ? "Login In Here" : "Create an Account Instead"}
         </button>
       </div>
     </form>

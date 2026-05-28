@@ -24,7 +24,7 @@ export default function Auth() {
         </p>
       </div>
 
-      {authMethod ? <MagicLinkForm /> : <EmailPasswordForm />}
+      {authMethod ? <EmailPasswordForm /> : <MagicLinkForm />}
 
       <div className="text-center pt-1">
         <button
