@@ -1,4 +1,4 @@
-("use client");
+"use client";
 import { useState } from "react";
 import { Loader2, Paperclip } from "lucide-react";
 import toast from "react-hot-toast/headless";
