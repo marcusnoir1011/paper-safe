@@ -19,7 +19,6 @@ import { recognizeImage } from "@/lib/tesseract";
 import { parseJpBill } from "@/utility/parseJpBill";
 
 import CameraOcr from "./CameraOcr";
-import { extractEtag } from "next/dist/server/image-optimizer";
 
 export default function UploadDoc() {
   const router = useRouter();
@@ -79,9 +78,9 @@ export default function UploadDoc() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
         {/* Left */}
-        <div className="relative group h-full">
+        <div className="relative group h-full flex">
           <input
             type="file"
             onChange={handleUpload}
@@ -170,7 +169,7 @@ export default function UploadDoc() {
 
           <div className="p-6 grid grid-cols-2 gap-5">
             <div className="space-y-3">
-              <div className="flex items-center gap–3 text-muted font-mono uppercase tracking-wider text-[10px] font-bold">
+              <div className="flex items-center gap-3 text-muted font-mono uppercase tracking-wider text-[10px] font-bold">
                 <JapaneseYen size={12} />
                 <span>Amount Detected</span>
               </div>
@@ -178,7 +177,7 @@ export default function UploadDoc() {
                 ¥{Number(amount).toLocaleString()}
               </p>
             </div>
-            <div className="space-y-3 border-l border-border-ligth pl-6">
+            <div className="space-y-3 border-l border-border-light pl-6">
               <div className="flex items-center gap-3 text-muted font-mono uppercase tracking-tighter">
                 <Calendar size={12} />
                 <span>Due Date</span>

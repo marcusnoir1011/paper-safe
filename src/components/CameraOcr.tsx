@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Camera, VideoOff } from "lucide-react";
+import { Camera, RefreshCw, X } from "lucide-react";
 
 import { worker } from "@/lib/tesseract";
 import { parseJpBill } from "@/utility/parseJpBill";
+import toast from "react-hot-toast/headless";
 
 interface CameraOcrProps {
   onSuccess: (extractedAmount: string, extractedDate: string) => void;
@@ -16,27 +17,17 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
   const myStream = useRef<MediaStream | null>(null);
 
   const [scanActive, setScanActive] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   // video config
-  // const vidWidth = window.innerWidth - 60;
+  // layout
   const screenWidth = typeof window !== "undefined" ? window.innerWidth : 360;
-  const vidWidth = screenWidth - 60;
-  const vidHeight = 260;
-  // const vidOffSetTop = 240;
-  // const vidOffSetLeft = screenWidth / 2 - vidWidth / 2;
+  const vidWidth = screenWidth - 48;
+  const vidHeight = 380;
 
-  // indicator config
-  const marginX = 40;
-  const indWidth = vidWidth - marginX;
-  const indHeight = 80;
-  // const indOffSetTop = vidOffSetTop + vidHeight / 2 - indHeight / 2;
-  // const indOffSetLeft = screenWidth / 2 - indWidth / 2;
-
-  const activeRef = useRef(scanActive);
-
-  useEffect(() => {
-    activeRef.current = scanActive;
-  }, [scanActive]);
+  // target indicator config
+  const targetWidth = vidWidth - 100;
+  const targetHeight = 260;
 
   useEffect(() => {
     if (!scanActive) return;
@@ -46,6 +37,8 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
           },
           audio: false,
         });
@@ -56,10 +49,8 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
           myVideo.current.srcObject = stream;
           await myVideo.current.play();
         }
-
-        setTimeout(tick, 1000);
       } catch (err) {
-        console.error(err);
+        console.error("Camera access failed: ", err);
       }
     };
 
@@ -76,103 +67,132 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
       myStream.current = null;
     }
     setScanActive(false);
+    setProcessing(false);
   };
 
-  const tick = async () => {
-    if (!scanActive) return;
+  // manual trigger of capture
+  const captureAndScan = async () => {
+    if (!myVideo.current || processing) return;
+    setProcessing(true);
 
-    if (
-      myVideo.current &&
-      myVideo.current.readyState === myVideo.current.HAVE_ENOUGH_DATA
-    ) {
-      const canvas = document.createElement("canvas");
-      canvas.width = indWidth;
-      canvas.height = indHeight;
+    const video = myVideo.current;
+    const canvas = document.createElement("canvas");
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext("2d");
 
-      const image = myVideo.current;
+    if (ctx) {
+      // dynamic map
+      const scaleX = video.videoWidth / video.offsetWidth;
+      const scaleY = video.videoHeight / video.offsetHeight;
 
-      // sourcwe
-      const sx = marginX / 2 / 2;
-      const sy = vidHeight - indHeight;
-      const sWidth = indWidth * 2;
-      const sHeight = indHeight * 2;
+      // target frame set
+      const sx = ((video.offsetWidth - targetWidth) / 2) * scaleX;
+      const sy = ((video.offsetHeight - targetHeight) / 2) * scaleY;
+      const sWidth = targetWidth * scaleX;
+      const sHeight = targetHeight * scaleY;
 
-      // destination
-      const dx = 0;
-      const dy = 0;
-      const dWidth = indWidth;
-      const dHeight = indHeight;
-
-      canvas
-        .getContext("2d")
-        ?.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-
-      // OCR
       try {
+        ctx.drawImage(
+          video,
+          sx,
+          sy,
+          sWidth,
+          sHeight,
+          0,
+          0,
+          targetWidth,
+          targetHeight,
+        );
+
         const {
           data: { text },
         } = await worker.recognize(canvas);
-        console.log("Live Capture: ", text);
+
+        console.log("Extracted OCR Text: \n", text);
 
         const { extractedAmount, extractedDate } = parseJpBill(text);
-        if (extractedAmount || extractedDate) {
-          onSuccess(extractedAmount, extractedAmount);
-          stopCamera();
-          return;
-        }
+        onSuccess(extractedAmount || "", extractedDate || "");
+        stopCamera();
       } catch (err) {
-        console.error(err);
+        console.error("OCR recognition error: ", err);
+        toast.error("Could not extract clean text. Please try aligning again.");
+      } finally {
+        setProcessing(false);
       }
-
-      setTimeout(tick, 1000);
     }
   };
+
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full group cursor-pointer">
+    <div className="flex flex-col items-center justify-center w-full">
       {!scanActive ? (
         <button
           onClick={() => setScanActive(true)}
-          className="flex flex-col items-center gap-5 w-full h-full"
+          className="flex flex-col items-center gap-5 w-full group py-6"
         >
-          <div className="p-4 bg-bg-surface text-ink rounded-full group-hover:scale-110 transition-transform duration-200">
+          <div className="p-4 bg-slate-100 text-ink rounded-full group-hover:scale-110 transition-transform duration-200">
             <Camera size={32} />
           </div>
-          <div>
-            <p className="font-sans text-sm font-semibold text-slate-900">
-              Scan Document Live
-            </p>
-          </div>
+          <span className="font-sans text-sm font-semibold text-slate-900">
+            Scan via Camera
+          </span>
         </button>
       ) : (
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="relative w-45 h-25 rounded-2xl overflow-hidden border border-border-light bg-slate-900 flex items-center justify-center	">
+        <div className="w-full flex flex-col items-center gap-4">
+          <div
+            style={{
+              width: "100%",
+              maxWidth: `${vidWidth}px`,
+              height: `${vidHeight}px`,
+            }}
+            className="relative flex items-center justify-center rounded-2xl overflow-hidden border border-border-light bg-slate-950 shadow-inner"
+          >
             <video
               ref={myVideo}
               autoPlay
               muted
               playsInline
-              width={vidWidth}
-              height={vidHeight}
               className="object-cover w-full h-full"
             />
             <div
-              className="absolute border bodrer-ink/80 rounded-md pointer-events-none bg-transparent"
               style={{
-                width: indWidth,
-                height: indHeight,
+                width: `${targetWidth}px`,
+                height: `${targetHeight}px`,
               }}
+              className={`
+                  absolute border-2 border-dashed rounded-xl transition-colors duration-300 pointer-events-none ${
+                    processing
+                      ? "border-amber-400 bg-amber-500/10"
+                      : "border-ink bg-transparent shadow[0_0_0_9999px_rbga(0,0,0,0.5)]"
+                  }
+                `}
             />
           </div>
 
-          <div className="spacy-y-1">
-            <p className="font-sans text-xs font-semibold text-slate-900">
-              Scanning Live Feed
-            </p>
+          <div className="flex flex-col sm:flex-row w-full max-w-sm sm:max-w-none gap-3 items-stretch">
             <button
-              onClick={() => setScanActive(false)}
-              className="font-mono text-[10px] rounded-md p-1 border border-border-light bg-rose-200 text-rose-600 hover:text-rose-700 uppercase tracking-widest font-bold transition-colors block mx-auto"
+              onClick={captureAndScan}
+              disabled={processing}
+              className="flex flex-1 items-center justify-center font-sans text-sm font-bold bg-slate-900 text-white shadow-sm py-4 rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-70"
             >
-              Cancel Scan
+              {processing ? (
+                <div className="gap-2 flex items-center justify-center">
+                  <RefreshCw size={16} className="animate-spin" />
+                  <span>Reading document...</span>
+                </div>
+              ) : (
+                <div className="gap-2 flex items-center justify-center">
+                  <Camera size={16} />
+                  <span>Capture & Scan</span>
+                </div>
+              )}
+            </button>
+            <button
+              onClick={stopCamera}
+              disabled={processing}
+              className="flex justify-center items-center py-4 px-5 rounded-xl border border-border-light bg-surface text-slate-500 hover:ink transition-colors disabled:opacity-50"
+            >
+              <X size={20} />
             </button>
           </div>
         </div>
