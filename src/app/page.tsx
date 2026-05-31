@@ -7,7 +7,6 @@ import Auth from "@/app/auth/page";
 import UploadDoc from "@/components/UploadDoc";
 import DocumentList from "@/components/DocumentList";
 import DashboardStats from "@/components/DashboardStats";
-import NotificationReminder from "@/components/NotificationReminder";
 import UserMenu from "@/components/UserMenu";
 
 export const dynamic = "force-dynamic";
@@ -42,11 +41,7 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return (
-      <main className="grid place-items-center min-h-screen bg-slate-50">
-        <Auth />
-      </main>
-    );
+    return <Auth />;
   }
 
   // data for dashboard
@@ -65,60 +60,55 @@ export default async function Home() {
   const paidBillCount = safeDocuments?.filter((doc) => doc.is_paid).length;
 
   return (
-    <>
-      <div className="fixed top-4 right-4 z-50 md:top-6 md:right-6">
-        <UserMenu />
-      </div>
-      <main className="max-w-xl mx-auto py-12 px-6 space-y-12">
-        <header className="flex items-center justify-between bg-surface w-full border border-border-light p-4 rounded-2xl shadow-sm gap-3">
-          <div className="flex items-center gap-3">
-            <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light shrink-0">
-              <Paperclip className="text-white" size={48} />
-            </div>
-            <div className="flex flex-col justify-between self-stretch py-1">
-              <h1 className="font-sans text-4xl font-bold text-slate-900 tracking-tight leading-none">
-                Paper Safe
-              </h1>
-              <p className="font-mono text-sm font-medium mt-1 text-muted tracking-tighter">
-                Keep those Japanese bills
-                <br /> in check!
-              </p>
-            </div>
+    <main className="max-w-xl mx-auto py-12 px-6 space-y-12">
+      <header className="flex items-center justify-between bg-surface w-full border border-border-light p-4 rounded-2xl shadow-sm gap-3">
+        <div className="flex items-center gap-3">
+          <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light shrink-0">
+            <Paperclip className="text-white" size={48} />
           </div>
-
-          <div className="shrink-0">
-            <NotificationReminder documents={safeDocuments} />
+          <div className="flex flex-col justify-between self-stretch py-1">
+            <h1 className="font-sans text-4xl font-bold text-slate-900 tracking-tight leading-none">
+              Paper Safe
+            </h1>
+            <p className="font-mono text-sm font-medium mt-1 text-muted tracking-tighter">
+              Keep those Japanese bills
+              <br /> in check!
+            </p>
           </div>
-        </header>
+        </div>
 
-        <section className="space-y-3">
-          <div className="flex items-center gap-3 text-slate-400">
-            <PlusCircle size={16} />
-            <h2 className="font-sans text-xs font-bold uppercase tracking-wider">
-              Upload
-            </h2>
-          </div>
-          <UploadDoc />
-        </section>
+        <div className="shrink-0 flex items-center">
+          <UserMenu />
+        </div>
+      </header>
 
-        <section className="space-y-3">
-          <DashboardStats
-            totalUnpaidAmount={totalUnpaidAmount}
-            overdueDateCount={overBillsCount}
-            paidBillCount={paidBillCount}
-          />
-        </section>
+      <section className="space-y-3">
+        <div className="flex items-center gap-3 text-slate-400">
+          <PlusCircle size={16} />
+          <h2 className="font-sans text-xs font-bold uppercase tracking-wider">
+            Upload
+          </h2>
+        </div>
+        <UploadDoc />
+      </section>
 
-        <section className="space-y-3">
-          <div className="flex items-center gap-3 text-slate-400">
-            <LayoutList size={18} />
-            <h2 className="font-sans text-sm font-bold text-slate-400 uppercase tracking-wider">
-              Recent Documents
-            </h2>
-          </div>
-          <DocumentList />
-        </section>
-      </main>
-    </>
+      <section className="space-y-3">
+        <DashboardStats
+          totalUnpaidAmount={totalUnpaidAmount}
+          overdueDateCount={overBillsCount}
+          paidBillCount={paidBillCount}
+        />
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center gap-3 text-slate-400">
+          <LayoutList size={18} />
+          <h2 className="font-sans text-sm font-bold text-slate-400 uppercase tracking-wider">
+            Recent Documents
+          </h2>
+        </div>
+        <DocumentList />
+      </section>
+    </main>
   );
 }

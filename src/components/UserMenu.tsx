@@ -9,7 +9,6 @@ import {
   KeyRound,
   UserX,
   ChevronLeft,
-  LogOutIcon,
 } from "lucide-react";
 
 import { supabase } from "@/lib/client";
@@ -37,16 +36,16 @@ export default function UserMenu() {
           if (isOpen) closeMenu();
           else setIsOpen(true);
         }}
-        className="flex items-center justify-center mb-2 w-10 h-10 rounded-full bg-surface text-ink border border-border-light hover:border-ink transition focus:outline-none"
+        className="flex items-center justify-center mb-2 w-15 h-15 md:w-18 md:h-18 rounded-full bg-surface text-ink border border-border-light hover:border-ink transition focus:outline-none shadow-sm shrink-0"
       >
-        <User className="w-5 h-5 text-ink" />
+        <User className="w-8 h-8 md:w-9 md:h-9 text-ink shrink-0" />
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={closeMenu} />
 
-          <div className="absolute right-0 w-48 rounded-xl space-y-2 p-2 shadow-md bg-surface border border-border-light ring-opacity-5 z-20">
+          <div className="absolute right-0 w-52 rounded-xl space-y-2 p-2 shadow-md bg-surface border border-border-light ring-opacity-5 z-20">
             {menuView === "main" && (
               <>
                 <div>
@@ -54,7 +53,7 @@ export default function UserMenu() {
                     onClick={() => setMenuView("account")}
                     className="flex items-center justify-between w-full px-4 py-2 text-sm font-sans hover:ring-ink hover:ring-1 hover:shadow-md rounded-lg text-ink transition-colors"
                   >
-                    <Settings className="w-5 h-5" />
+                    <Settings className="w-5 h-5 shrink-0" />
                     <span>Account</span>
                   </button>
                 </div>
@@ -62,9 +61,9 @@ export default function UserMenu() {
                 <div>
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center justify-between w-full px-4 py-2 text-sm font-sans hyover:border-red-300 rounded-lx text-red-600 hover:bg-red-100"
+                    className="flex items-center justify-between w-full px-4 py-2 text-sm font-sans hover:border-red-300 rounded-xl text-red-600 hover:bg-red-100"
                   >
-                    <LogOut className="w-5 h-5" />
+                    <LogOut className="w-5 h-5 shrink-0" />
                     <span>Sign Out</span>
                   </button>
                 </div>
@@ -88,9 +87,9 @@ export default function UserMenu() {
                       closeMenu();
                       router.push("/account/change-password");
                     }}
-                    className="flex items-center justify-between w-full px-4 py-2 text-sm font-sans hover:rign-ink hover:ring-1 hover:shadow-md rounded-lg text-ink transition-colors"
+                    className="flex items-center justify-between w-full px-4 py-2 text-sm font-sans hover:ring-ink hover:ring-1 hover:shadow-md rounded-lg text-ink transition-colors"
                   >
-                    <KeyRound className="w-5 h-5" />
+                    <KeyRound className="w-5 h-5 text-ink shrink-0" />
                     <span>Password</span>
                   </button>
                 </div>
@@ -102,7 +101,7 @@ export default function UserMenu() {
                     }}
                     className="flex items-center justify-between w-full px-4 py-2 text-sm font-sans hover:ring-ink hover:ring-1 hover:shadow-md rounded-lg text-ink transition-colors"
                   >
-                    <UserX className="w-5 h-5" />
+                    <UserX className="w-5 h-5 text-ink shrink-0" />
                     <span>Delete</span>
                   </button>
                 </div>
