@@ -27,38 +27,33 @@ export default function UploadDoc() {
   const [amount, setAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const proccessDocumentFile = async (file: File | Blob, fileName: string) => {
     try {
       setLoading(true);
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      // ocr
       const tempUrl = URL.createObjectURL(file);
       const rawText = await recognizeImage(tempUrl);
-      console.log(rawText);
+      console.log("OCR output text:\n", rawText);
+
       const { extractedAmount, extractedDate } = parseJpBill(rawText);
 
-      setAmount(extractedAmount);
-      setDueDate(extractedDate);
+      setAmount(extractedAmount || "");
+      setDueDate(extractedDate || "");
 
-      // getting current user
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not logged in");
 
-      // upload doc to storage
+      if (!user) throw new Error("User Not Logged in");
+
       const filePath = `${user.id}/${Date.now()}-${file.name}`;
       const { error: uploadError } = await supabase.storage
         .from("documents")
         .upload(filePath, file);
       if (uploadError) throw uploadError;
 
-      // save to database
       const { error: dbError } = await supabase.from("documents").insert({
         user_id: user.id,
-        title: file.name,
+        title: fileName,
         image_path: filePath,
         category: "Unsorted",
         amount: extractedAmount ? parseInt(extractedAmount) : 0,
@@ -67,13 +62,20 @@ export default function UploadDoc() {
       });
       if (dbError) throw dbError;
 
+      toast.success("Uploaded Successfully!");
       router.refresh();
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "An issue occurred during extraction");
     } finally {
-      toast.success("Uploaded Successfull!");
       setLoading(false);
     }
+  };
+
+  const handleUploadClick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await proccessDocumentFile(file, file.name);
   };
 
   return (
@@ -83,7 +85,7 @@ export default function UploadDoc() {
         <div className="relative group h-full flex">
           <input
             type="file"
-            onChange={handleUpload}
+            onChange={handleUploadClick}
             disabled={loading}
             className="hidden"
             id="file-upload"
@@ -137,10 +139,9 @@ export default function UploadDoc() {
         {/* Right */}
         <div className="border-2 border-dashed hover:border-ink border-border-mid rounded-3xl overflow-hidden bg-surface p-4 flex flex-col justify-center shadow-sm">
           <CameraOcr
-            onSuccess={(extractedAmount, extractedDate) => {
-              setAmount(extractedAmount);
-              setDueDate(extractedDate);
-              toast.success("Live Scan Processing Complete!");
+            processingFromParent={loading}
+            onCapture={async (blob, name) => {
+              await proccessDocumentFile(blob, name);
             }}
           />
         </div>

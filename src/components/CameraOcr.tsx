@@ -7,27 +7,27 @@ import { Camera, RefreshCw, X } from "lucide-react";
 import { worker } from "@/lib/tesseract";
 import { parseJpBill } from "@/utility/parseJpBill";
 import toast from "react-hot-toast/headless";
+import { blob } from "node:stream/consumers";
 
 interface CameraOcrProps {
-  onSuccess: (extractedAmount: string, extractedDate: string) => void;
+  onCapture: (imageBlob: Blob, fileName: string) => void;
+  processingFromParent: boolean;
 }
 
-export default function CameraOcr({ onSuccess }: CameraOcrProps) {
+export default function CameraOcr({
+  onCapture,
+  processingFromParent,
+}: CameraOcrProps) {
   const myVideo = useRef<HTMLVideoElement | null>(null);
   const myStream = useRef<MediaStream | null>(null);
 
   const [scanActive, setScanActive] = useState(false);
-  const [processing, setProcessing] = useState(false);
 
   // video config
   // layout
   const screenWidth = typeof window !== "undefined" ? window.innerWidth : 360;
   const vidWidth = screenWidth - 48;
   const vidHeight = 380;
-
-  // // target indicator config
-  // const targetWidth = vidWidth - 100;
-  // const targetHeight = 260;
 
   useEffect(() => {
     if (!scanActive) return;
@@ -68,12 +68,10 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
       myStream.current = null;
     }
     setScanActive(false);
-    setProcessing(false);
   };
 
   const captureAndScan = async () => {
-    if (!myVideo.current || processing) return;
-    setProcessing(true);
+    if (!myVideo.current || processingFromParent) return;
 
     const video = myVideo.current;
 
@@ -83,7 +81,6 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
     if (width === 0 || height === 0) {
       console.error("Video Dimensions are 0. Stream might not be ready.");
       toast.error("Camera is still warming up. Please try again.");
-      setProcessing(false);
       return;
     }
 
@@ -95,35 +92,32 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
     if (!ctx) {
       console.error("Could not get 2D context from canvas.");
       toast.error("Failed to process image frame.");
-      setProcessing(false);
       return;
     }
 
     try {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const {
-        data: { text },
-      } = await worker.recognize(canvas);
-
-      console.log("Extracted OCR Text: \n", text);
-
-      if (!text || text.trim() === "") {
-        throw new Error("Tesseract returned empty text.");
-      }
-
-      const { extractedAmount, extractedDate } = parseJpBill(text);
-      onSuccess(extractedAmount || "", extractedDate || "");
-      stopCamera();
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const generatedName = `camera-capture-${Date.now()}.jpg`;
+            onCapture(blob, generatedName);
+            stopCamera();
+          }
+        },
+        "image/jpeg",
+        0.95,
+      );
     } catch (err) {
       console.error("OCR recognition error: ", err);
       toast.error(
         "Could not extract clean text. Please try holding the document closer.",
       );
-    } finally {
-      setProcessing(false);
     }
   };
+
+  const isWorking = processingFromParent;
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
@@ -159,7 +153,7 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
             <div
               className={`
                   absolute inset-6 border-2 border-dashed rounded-xl transition-colors duration-300 pointer-events-none ${
-                    processing
+                    isWorking
                       ? "border-amber-400 bg-amber-500/10"
                       : "border-slate-400/40 bg-transparent"
                   }
@@ -170,10 +164,10 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
           <div className="flex flex-col sm:flex-row w-full max-w-sm sm:max-w-none gap-3 items-stretch">
             <button
               onClick={captureAndScan}
-              disabled={processing}
+              disabled={isWorking}
               className="flex flex-1 items-center justify-center font-sans text-sm font-bold bg-slate-900 text-white shadow-sm py-4 rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-70"
             >
-              {processing ? (
+              {isWorking ? (
                 <div className="gap-2 flex items-center justify-center">
                   <RefreshCw size={16} className="animate-spin" />
                   <span>Reading document...</span>
@@ -187,7 +181,7 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
             </button>
             <button
               onClick={stopCamera}
-              disabled={processing}
+              disabled={isWorking}
               className="flex justify-center items-center py-4 px-5 rounded-xl border border-border-light bg-surface text-slate-500 hover:ink transition-colors disabled:opacity-50"
             >
               <X size={20} />
