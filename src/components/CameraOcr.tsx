@@ -25,9 +25,9 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
   const vidWidth = screenWidth - 48;
   const vidHeight = 380;
 
-  // target indicator config
-  const targetWidth = vidWidth - 100;
-  const targetHeight = 260;
+  // // target indicator config
+  // const targetWidth = vidWidth - 100;
+  // const targetHeight = 260;
 
   useEffect(() => {
     if (!scanActive) return;
@@ -37,8 +37,8 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: "environment",
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
+            width: { ideal: 720 },
+            height: { ideal: 1280 },
           },
           audio: false,
         });
@@ -51,6 +51,7 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
         }
       } catch (err) {
         console.error("Camera access failed: ", err);
+        toast.error("Could not access camera device.");
       }
     };
 
@@ -70,56 +71,57 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
     setProcessing(false);
   };
 
-  // manual trigger of capture
   const captureAndScan = async () => {
     if (!myVideo.current || processing) return;
     setProcessing(true);
 
     const video = myVideo.current;
+
+    const width = video.videoWidth || video.clientWidth || 720;
+    const height = video.videoHeight || video.clientHeight || 1280;
+
+    if (width === 0 || height === 0) {
+      console.error("Video Dimensions are 0. Stream might not be ready.");
+      toast.error("Camera is still warming up. Please try again.");
+      setProcessing(false);
+      return;
+    }
+
     const canvas = document.createElement("canvas");
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext("2d");
 
-    if (ctx) {
-      // dynamic map
-      const scaleX = video.videoWidth / video.offsetWidth;
-      const scaleY = video.videoHeight / video.offsetHeight;
+    if (!ctx) {
+      console.error("Could not get 2D context from canvas.");
+      toast.error("Failed to process image frame.");
+      setProcessing(false);
+      return;
+    }
 
-      // target frame set
-      const sx = ((video.offsetWidth - targetWidth) / 2) * scaleX;
-      const sy = ((video.offsetHeight - targetHeight) / 2) * scaleY;
-      const sWidth = targetWidth * scaleX;
-      const sHeight = targetHeight * scaleY;
+    try {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      try {
-        ctx.drawImage(
-          video,
-          sx,
-          sy,
-          sWidth,
-          sHeight,
-          0,
-          0,
-          targetWidth,
-          targetHeight,
-        );
+      const {
+        data: { text },
+      } = await worker.recognize(canvas);
 
-        const {
-          data: { text },
-        } = await worker.recognize(canvas);
+      console.log("Extracted OCR Text: \n", text);
 
-        console.log("Extracted OCR Text: \n", text);
-
-        const { extractedAmount, extractedDate } = parseJpBill(text);
-        onSuccess(extractedAmount || "", extractedDate || "");
-        stopCamera();
-      } catch (err) {
-        console.error("OCR recognition error: ", err);
-        toast.error("Could not extract clean text. Please try aligning again.");
-      } finally {
-        setProcessing(false);
+      if (!text || text.trim() === "") {
+        throw new Error("Tesseract returned empty text.");
       }
+
+      const { extractedAmount, extractedDate } = parseJpBill(text);
+      onSuccess(extractedAmount || "", extractedDate || "");
+      stopCamera();
+    } catch (err) {
+      console.error("OCR recognition error: ", err);
+      toast.error(
+        "Could not extract clean text. Please try holding the document closer.",
+      );
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -155,15 +157,11 @@ export default function CameraOcr({ onSuccess }: CameraOcrProps) {
               className="object-cover w-full h-full"
             />
             <div
-              style={{
-                width: `${targetWidth}px`,
-                height: `${targetHeight}px`,
-              }}
               className={`
-                  absolute border-2 border-dashed rounded-xl transition-colors duration-300 pointer-events-none ${
+                  absolute inset-6 border-2 border-dashed rounded-xl transition-colors duration-300 pointer-events-none ${
                     processing
                       ? "border-amber-400 bg-amber-500/10"
-                      : "border-ink bg-transparent shadow[0_0_0_9999px_rbga(0,0,0,0.5)]"
+                      : "border-slate-400/40 bg-transparent"
                   }
                 `}
             />
