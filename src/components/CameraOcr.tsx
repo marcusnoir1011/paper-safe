@@ -129,7 +129,7 @@ export default function CameraOcr({
           <div className="p-4 bg-slate-100 text-ink rounded-full group-hover:scale-110 transition-transform duration-200">
             <Camera size={32} />
           </div>
-          <span className="font-sans text-sm font-semibold text-slate-900">
+          <span className="font-sans text-md font-semibold text-slate-900">
             Scan via Camera
           </span>
         </button>

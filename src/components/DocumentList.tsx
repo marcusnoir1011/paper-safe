@@ -26,10 +26,10 @@ export default async function DocumentList({
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between px-2">
-        <span className="font-mono text-[10px] font-bold uppercase tradking widest text-muted">
+        <span className="font-mono text-sm font-bold uppercase tradking widest text-muted">
           Recent Docuemnts
         </span>
-        <span className="font-mono text-[10px] font-bold text-ink bg-slate-100 px-2 py-1 rounded">
+        <span className="font-mono text-sm font-bold text-ink bg-slate-100 px-2 py-1 rounded-lg border border-border-mid shadow-md">
           {documents.length} Items
         </span>
       </div>

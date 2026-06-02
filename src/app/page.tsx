@@ -102,8 +102,8 @@ export default async function Home() {
 
       <section className="space-y-3">
         <div className="flex items-center gap-3 text-slate-400">
-          <PlusCircle size={16} />
-          <h2 className="font-sans text-xs font-bold uppercase tracking-wider">
+          <PlusCircle size={20} />
+          <h2 className="font-sans text-md font-bold uppercase tracking-wider">
             Upload
           </h2>
         </div>
@@ -120,8 +120,8 @@ export default async function Home() {
 
       <section className="space-y-3">
         <div className="flex items-center gap-3 text-slate-400">
-          <LayoutList size={18} />
-          <h2 className="font-sans text-sm font-bold text-slate-400 uppercase tracking-wider">
+          <LayoutList size={20} />
+          <h2 className="font-sans text-md font-bold text-slate-400 uppercase tracking-wider">
             Recent Documents
           </h2>
         </div>

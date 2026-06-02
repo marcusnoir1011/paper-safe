@@ -121,14 +121,14 @@ export default function UploadDoc() {
                   <UploadCloud size={32} />
                 </div>
                 <div className="text-center">
-                  <p className="font-sans text-sm font-semibold text-slate-900">
+                  <p className="font-sans text-md md:text-sm font-semibold text-slate-900">
                     Drop Your Bill Here or{" "}
                     <span className="text-ink underline underline-offset-4">
                       browse
                     </span>
                   </p>
                   <p className="font-mono text-[10px] text-muted mt-1 uppercase tracking-wider">
-                    PNG, JPG up to 10MB
+                    PNG, JPG up to 5MB
                   </p>
                 </div>
               </div>
@@ -162,7 +162,7 @@ export default function UploadDoc() {
                 setAmount("");
                 setDueDate("");
               }}
-              className="font-mono text-[10px] font-bold text-muted hover:text-ink uppercase transition-colors"
+              className="font-mono text-md md:text-sm font-bold text-muted hover:text-ink uppercase transition-colors"
             >
               Dismiss
             </button>
@@ -190,7 +190,7 @@ export default function UploadDoc() {
             <div className="bg-green-100 p-2 rounded-full">
               <CheckCircle2 size={12} className="text-green-600" />
             </div>
-            <span className="font-sans text-[10px] font-bold text-green-700 uppercase tracking-tighter">
+            <span className="font-sans text-sm font-bold text-green-600 uppercase tracking-tighter">
               Auto-saved to your PAPER SAFE
             </span>
           </div>
