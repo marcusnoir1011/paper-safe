@@ -45,7 +45,7 @@ export default function UploadDoc() {
 
       if (!user) throw new Error("User Not Logged in");
 
-      const filePath = `${user.id}/${Date.now()}-${file.name}`;
+      const filePath = `${user.id}/${Date.now()}-${fileName}`;
       const { error: uploadError } = await supabase.storage
         .from("documents")
         .upload(filePath, file);

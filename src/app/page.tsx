@@ -45,8 +45,26 @@ export default async function Home() {
   }
 
   // data for dashboard
-  const { data: documents } = await supabase.from("documents").select("*");
+  const { data: documents } = await supabase
+    .from("documents")
+    .select("*")
+    .order("created_at", { ascending: false });
   const safeDocuments = documents || [];
+
+  const docsWithUrls = await Promise.all(
+    safeDocuments.map(async (doc) => {
+      const { data } = await supabase.storage
+        .from("documents")
+        .createSignedUrl(doc.image_path, 3600);
+
+      return { ...doc, signedUrl: data?.signedUrl };
+    }),
+  );
+
+  const visibleDocuments = docsWithUrls.filter(
+    (doc) => doc.is_visible !== false,
+  );
+
   const unpaidBills = safeDocuments?.filter((doc) => !doc.is_paid);
   const totalUnpaidAmount = unpaidBills?.reduce(
     (sum, doc) => sum + (doc.amount || 0),
@@ -107,7 +125,7 @@ export default async function Home() {
             Recent Documents
           </h2>
         </div>
-        <DocumentList />
+        <DocumentList documents={visibleDocuments} />
       </section>
     </main>
   );

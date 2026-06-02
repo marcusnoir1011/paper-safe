@@ -1,30 +1,13 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-
 import { Calendar, ChevronRight, FileText } from "lucide-react";
 
 import { ImagePreview } from "./ImagePreveiw";
 import EditDoc from "./EditDoc";
 
-export default async function DocumentList() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    },
-  );
-
-  const { data: documents } = await supabase
-    .from("documents")
-    .select("*")
-    .order("created_at", { ascending: false });
-
+export default async function DocumentList({
+  documents,
+}: {
+  documents: any[];
+}) {
   if (!documents || documents.length === 0)
     return (
       <div className="text-center py-20 border-2 border-dashed border-border-mid rounded-3xl bg-surface/50">
@@ -40,16 +23,6 @@ export default async function DocumentList() {
       </div>
     );
 
-  const docsWithUrls = await Promise.all(
-    documents.map(async (doc) => {
-      const { data } = await supabase.storage
-        .from("documents")
-        .createSignedUrl(doc.image_path, 3600);
-
-      return { ...doc, signedUrl: data?.signedUrl };
-    }),
-  );
-
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between px-2">
@@ -61,7 +34,7 @@ export default async function DocumentList() {
         </span>
       </div>
 
-      {docsWithUrls.map((doc) => (
+      {documents.map((doc) => (
         <div
           key={doc.id}
           className="group bg-surface border border-border-light rounded-2xl p-4 shadow-sm hover:border-border-mid hover:shadow-md transition-all flex items-center gap-3"

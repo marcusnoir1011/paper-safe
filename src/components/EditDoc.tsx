@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { X, CheckCircle2 } from "lucide-react";
 
@@ -13,15 +13,22 @@ export default function EditDoc({ document }: { document: any }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPaid, setIsPaid] = useState(document.is_paid);
 
+  useEffect(() => {
+    setIsPaid(document.is_paid);
+  }, [document.is_paid, isOpen]);
+
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
 
+    const rawDueDate = formData.get("due_date");
+    const cleanDueDate = rawDueDate && rawDueDate !== "" ? rawDueDate : null;
+
     const { error } = await supabase
       .from("documents")
       .update({
-        due_date: formData.get("due_date"),
+        due_date: cleanDueDate,
         amount: Number(formData.get("amount")),
         is_paid: isPaid,
       })
@@ -30,10 +37,33 @@ export default function EditDoc({ document }: { document: any }) {
     if (error) {
       toast.error(error?.message);
     } else {
-      router.refresh();
       toast.success("Successfully Edited!");
+      setIsOpen(false);
+      router.refresh();
     }
   };
+
+  const handleRemove = async () => {
+    const confirmed = window.confirm(
+      "Remove this document from your Desk? (Your total statistics and spending insights will be kept accurate.)",
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("documents")
+      .update({ is_visible: false })
+      .eq("id", document.id);
+
+    if (error) {
+      toast.error(error?.message || "Could not remove the document.");
+    } else {
+      setIsOpen(false);
+      toast.success("Document removed from Desk.");
+      router.refresh();
+    }
+  };
+
   return (
     <>
       <button
@@ -119,17 +149,26 @@ export default function EditDoc({ document }: { document: any }) {
                 </span>
               </label>
 
+              <div className="pt-2">
+                <button
+                  onClick={handleRemove}
+                  className="w-full px-4 py-2 text-xs font-bold font-sans text-red-600 bg-red-300 rounded-xl shadow-sm transition-colors uppercase tracking-tight text-center"
+                >
+                  Remove from Desk
+                </button>
+              </div>
+
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="flex-1 px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors uppercase tracking-tight"
+                  className="flex-1 px-4 py-2 text-xs font-bold border border-border-mid text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg shadow-md transition-colors uppercase tracking-tight"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 text-xs font-bold text-white bg-ink hover:bg-slate-800 rounded-lg shadow-sm transition-all active:scale-[0.98] uppercase tracking-tight"
+                  className="flex-1 px-4 py-2 text-xs font-bold text-white bg-ink hover:bg-slate-800 rounded-lg shadow-md transition-all active:scale-[0.98] uppercase tracking-tight"
                 >
                   Save Changes
                 </button>
