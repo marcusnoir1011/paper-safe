@@ -16,7 +16,7 @@ import toast from "react-hot-toast/headless";
 
 import { supabase } from "@/lib/client";
 import { recognizeImage } from "@/lib/tesseract";
-import { parseJpBill } from "@/utility/parseJpBill";
+import { parseJpBill } from "@/lib/utility/parseJpBill";
 
 import CameraOcr from "./CameraOcr";
 

@@ -3,11 +3,7 @@ import { Calendar, ChevronRight, FileText } from "lucide-react";
 import { ImagePreview } from "./ImagePreveiw";
 import EditDoc from "./EditDoc";
 
-export default async function DocumentList({
-  documents,
-}: {
-  documents: any[];
-}) {
+export default function DocumentList({ documents }: { documents: any[] }) {
   if (!documents || documents.length === 0)
     return (
       <div className="text-center py-20 border-2 border-dashed border-border-mid rounded-3xl bg-surface/50">
@@ -68,10 +64,10 @@ export default async function DocumentList({
               </div>
               <span
                 className={`
-                text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-widest border ${
+                text-xs px-2 py-1 rounded-md font-extrabold uppercase tracking-widest border ${
                   doc.is_paid
-                    ? "bg-green-10 text-green-700 border-green-200"
-                    : "bg-red-10 text-red-700 border-red-200"
+                    ? "bg-green-10 text-green-700 border-green-400"
+                    : "bg-red-10 text-red-700 border-red-400"
                 }
                 `}
               >

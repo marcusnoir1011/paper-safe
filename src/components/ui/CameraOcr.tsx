@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, RefreshCw, X } from "lucide-react";
 
 import { worker } from "@/lib/tesseract";
-import { parseJpBill } from "@/utility/parseJpBill";
+import { parseJpBill } from "@/lib/utility/parseJpBill";
 import toast from "react-hot-toast/headless";
 import { blob } from "node:stream/consumers";
 

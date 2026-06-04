@@ -1,5 +1,4 @@
 import { createServerClient } from "@supabase/ssr";
-import { discoverValidationDepths } from "next/dist/server/app-render/instant-validation/instant-validation";
 import { cookies } from "next/headers";
 
 export default async function TestPage() {

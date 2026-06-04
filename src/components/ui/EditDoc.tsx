@@ -17,17 +17,6 @@ export default function EditDoc({ document }: { document: any }) {
     setIsPaid(document.is_paid);
   }, [document.is_paid, isOpen]);
 
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     document.body.style.overflow = "hidden";
-  //   } else {
-  //     document.body.style.overflow = "unset";
-  //   }
-  //   return () => {
-  //     document.body.style.overflow = "unset";
-  //   };
-  // }, [isOpen]);
-
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -92,7 +81,7 @@ export default function EditDoc({ document }: { document: any }) {
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Modal Window */}
+          {/* Window */}
           <div className="relative bg-surface rounded-2xl shadow-xl w-[92%] sm:max-w-sm border border-border-light overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50 my-auto">
             <div className="flex items-center justify-between p-4 border-b border-border-light bg-slate-50/50">
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-tight">
