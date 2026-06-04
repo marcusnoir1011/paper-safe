@@ -1,12 +1,18 @@
-import { Wallet, AlertCircle, CheckCircle2, TrendingUp } from "lucide-react";
+import { Wallet, AlertCircle, CheckCircle2 } from "lucide-react";
+
+interface DashboardProps {
+  totalUnpaidAmount: number;
+  overdueDateCount: number;
+  paidBillCount: number;
+}
 
 export default function DashboardStats({
   totalUnpaidAmount,
   overdueDateCount,
   paidBillCount,
-}: any) {
+}: DashboardProps) {
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
       {/*Red*/}
       <div
         className="bg-surface border border-border-light rounded-xl p-4 shadow-sm flex items-center gap-5 transition-shadow hover:shadow-md"

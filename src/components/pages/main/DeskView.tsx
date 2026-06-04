@@ -21,27 +21,24 @@ export default function DeskView({
   paidBillCount,
 }: DeskViewProps) {
   return (
-    <div className="space-y-12">
-      <header className="flex items-center justify-between bg-surface w-full border border-border-light p-4 rounded-2xl shadow-sm gap-3">
-        <div className="flex items-center gap-3">
-          <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light shrink-0">
-            <Paperclip className="text-white" size={48} />
-          </div>
-          <div className="flex flex-col justify-between self-stretch py-1">
-            <h1 className="font-sans text-4xl font-bold text-slate-900 tracking-tight leading-none">
-              Paper Safe
-            </h1>
-            <p className="font-mono text-sm font-medium mt-1 text-muted tracking-tighter">
-              Keep those Japanese bills
-              <br /> in check!
-            </p>
-          </div>
+    <div className="space-y-10 md:space-y-12">
+      <header className="flex items-center justify-between bg-surface w-full border border-border-light p-4 rounded-2xl shadow-sm">
+        <div className="p-4 bg-ink rounded-2xl shadow-sm border border-border-light shrink-0 flex items-center justify-center">
+          <Paperclip className="text-white h-8 w-8 md:h-10 md:w-10" />
         </div>
-
         <div className="shrink-0 flex items-center">
           <UserMenu />
         </div>
       </header>
+
+      <section className="space-y-1.5 px-1 text-center">
+        <h1 className="t font-sans text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Welcome back to Paper Safe
+        </h1>
+        <p className="font-mono text-xs md:text-sm font-medium text-muted tracking-tight leading-relaxed">
+          Keep those Japanese bills & paperwork items fully in check.
+        </p>
+      </section>
 
       <section className="space-y-3">
         <div className="flex items-center gap-3 text-slate-400">

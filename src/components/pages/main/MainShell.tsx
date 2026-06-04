@@ -20,7 +20,7 @@ export default function MainShell({
 }: MainShellProps) {
   const [currentView, setCurrentView] = useState<"desk" | "vault">("desk");
   return (
-    <div>
+    <div className="w-full overflow-x-hidden pb-28">
       {currentView === "desk" ? (
         <DeskView
           visibleDocuments={visibleDocuments}

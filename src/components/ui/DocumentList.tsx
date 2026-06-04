@@ -6,7 +6,7 @@ import EditDoc from "./EditDoc";
 export default function DocumentList({ documents }: { documents: any[] }) {
   if (!documents || documents.length === 0)
     return (
-      <div className="text-center py-20 border-2 border-dashed border-border-mid rounded-3xl bg-surface/50">
+      <div className="text-center px-2 py-20 border-2 border-dashed border-border-mid rounded-3xl bg-surface/50">
         <div className="bg-slate-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
           <FileText size={26} className="text-muted" />
         </div>
