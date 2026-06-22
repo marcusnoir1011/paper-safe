@@ -1,0 +1,153 @@
+"use client";
+
+import { useState } from "react";
+
+import {
+  Search,
+  FolderSync,
+  CalendarDays,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+} from "lucide-react";
+import DocumentList from "@/components/ui/DocumentList";
+
+interface VaultViewProps {
+  documents: any[];
+}
+
+export default function VaultView({ documents }: VaultViewProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  // for search query
+  const filteredDocs = documents.filter((doc) =>
+    doc.title?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // grouping
+  const timelineGroups: Record<string, Record<string, any[]>> = {};
+
+  filteredDocs.forEach((doc) => {
+    let year = "unsorted";
+    let month = "no Date";
+
+    if (doc.due_date) {
+      const dateObj = new Date(doc.due_date);
+      if (!isNaN(dateObj.getTime())) {
+        year = dateObj.getFullYear().toString();
+        month = dateObj.toLocaleString("en-US", { month: "long" });
+      }
+    }
+
+    if (!timelineGroups[year]) timelineGroups[year] = {};
+    if (!timelineGroups[year][month]) timelineGroups[year][month] = [];
+
+    timelineGroups[year][month].push(doc);
+  });
+
+  // sorting
+  const sortedYears = Object.keys(timelineGroups).sort((a, b) => {
+    if (a === "Unsorted") return 1;
+    if (b === "Unsorted") return -1;
+    return b.localeCompare(a);
+  });
+
+  // "more content" toggle
+  const toggleMonth = (yearMonthKey: string) => {
+    setExpandedMonths((prev) => ({
+      ...prev,
+      [yearMonthKey]: !prev[yearMonthKey],
+    }));
+  };
+  return (
+    <div className="space-y-8">
+      <section className="space-y-1 px-1">
+        <h1 className="font-sans text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+          The Vault
+        </h1>
+        <p className="font-mono text-xs md:text-sm font-medium text-muted tracking-tight leading-relaxed">
+          Your permanent archive of chronological paperwork
+        </p>
+      </section>
+
+      <section className="relative w-full">
+        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
+          <Search size={18} />
+        </div>
+        <input
+          type="text"
+          placeholder="Search files by title..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-surface border border-border-light rounded-2xl font-sans text-sm font-medium shadow-sm transition-colors"
+        />
+      </section>
+
+      {filteredDocs.length === 0 && (
+        <div className="text-center py-16b border-border-light rounded-2xl font-sans text-slate-400 text-sm">
+          No matching documents found.
+        </div>
+      )}
+
+      <section className="space-y-8">
+        {sortedYears.map((year) => (
+          <div key={year} className="space-y-4">
+            {/* Year Separator Badge */}
+            <div className="flex items-center gap-3 border-b border-slate-100 pb-2 px-1">
+              <CalendarDays size={16} className="text-ink" />
+              <h2 className="font-sans font-extrabold text-lg text-slate-900 tracking-tight">
+                {year}
+              </h2>
+            </div>
+
+            {/* Months inside this Year */}
+            <div className="space-y-3 pl-1">
+              {Object.keys(timelineGroups[year]).map((month) => {
+                const yearMonthKey = `${year}-${month}`;
+                const isExpanded = !!expandedMonths[yearMonthKey];
+                const itemsCount = timelineGroups[year][month].length;
+
+                return (
+                  <div key={month} className="space-y-3">
+                    {/* Collapsible Month Accordion Header Bar */}
+                    <button
+                      onClick={() => toggleMonth(yearMonthKey)}
+                      className="w-full bg-surface border border-border-light rounded-xl p-3.5 flex items-center justify-between shadow-sm hover:bg-slate-50/50 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <FolderSync size={16} className="text-slate-400" />
+                        <span className="font-sans text-sm font-bold text-slate-800">
+                          {month}
+                        </span>
+                        <span className="font-mono text-[10px] font-extrabold bg-slate-100 px-2 py-0.5 border border-border-light text-muted rounded-md uppercase tracking-wider">
+                          {itemsCount} {itemsCount === 1 ? "Item" : "Items"}
+                        </span>
+                      </div>
+                      <div className="text-slate-400">
+                        {isExpanded ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Smooth expansion of matching Documents rows */}
+                    {isExpanded && (
+                      <div className="pl-2 animate-fade-in">
+                        <DocumentList documents={timelineGroups[year][month]} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </section>
+    </div>
+  );
+}

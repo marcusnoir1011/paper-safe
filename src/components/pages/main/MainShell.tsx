@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import NaviDock from "@/components/ui/NaviDock";
 import DeskView from "./DeskView";
+import VaultView from "./VaultView";
 
 interface MainShellProps {
   visibleDocuments: any[];
@@ -30,7 +31,7 @@ export default function MainShell({
         />
       ) : (
         <div className="text-center py-20 text-slate-400 font-mono text-lg">
-          Vault Coming Soon!
+          <VaultView documents={visibleDocuments} />
         </div>
       )}
 

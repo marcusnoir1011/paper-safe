@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Loader2 } from "lucide-react";
-import toast from "react-hot-toast/headless";
+import toast from "react-hot-toast";
 
 import { supabase } from "@/lib/client";
 
@@ -46,6 +46,8 @@ export function EmailPasswordForm() {
   const handleSignIn = async () => {
     setLoading(true);
 
+    console.log("1, Inside hanldeSignIn - about to call Supabase...");
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -54,10 +56,13 @@ export function EmailPasswordForm() {
       if (error) throw error;
 
       toast.success("Signed in successfully.");
-      router.push("/");
-      router.refresh();
+      window.location.href = "/";
+
+      // router.refresh();
+      // router.push("/");
     } catch (err: any) {
       toast.error(err.message);
+      alert(err.message);
       router.refresh();
     } finally {
       setLoading(false);
@@ -66,12 +71,13 @@ export function EmailPasswordForm() {
 
   const handleForm = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSignIn();
 
-    if (isSignUp) {
-      console.log("Registering new user...");
-    } else {
+    if (!isSignUp) {
+      handleSignIn();
       console.log("Logging existing user in...");
+    } else {
+      handleSignUp(e);
+      console.log("Registering new user...");
     }
   };
 
