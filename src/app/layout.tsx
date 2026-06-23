@@ -5,7 +5,7 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 const dmSans = DM_Sans({
-  variable: "--fonat-dm-sans",
+  variable: "--font-dm-sans",
   subsets: ["latin"],
 });
 

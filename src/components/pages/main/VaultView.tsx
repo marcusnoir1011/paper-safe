@@ -68,7 +68,7 @@ export default function VaultView({ documents }: VaultViewProps) {
         <h1 className="font-sans text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
           The Vault
         </h1>
-        <p className="font-mono text-xs md:text-sm font-medium text-muted tracking-tight leading-relaxed">
+        <p className="font-mono text-xs md:text-sm font-medium text-muted pt-1 tracking-tight leading-relaxed">
           Your permanent archive of chronological paperwork
         </p>
       </section>
@@ -82,12 +82,12 @@ export default function VaultView({ documents }: VaultViewProps) {
           placeholder="Search files by title..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-surface border border-border-light rounded-2xl font-sans text-sm font-medium shadow-sm transition-colors"
+          className="w-full bg-surface border border-border-light rounded-xl font-sans text-left pl-11 text-sm font-medium p-2 shadow-sm outline-none focus:border-accent transition-colors"
         />
       </section>
 
       {filteredDocs.length === 0 && (
-        <div className="text-center py-16b border-border-light rounded-2xl font-sans text-slate-400 text-sm">
+        <div className="text-center py-16 border-border-light rounded-2xl font-sans text-slate-400 text-sm">
           No matching documents found.
         </div>
       )}
