@@ -76,7 +76,7 @@ export default async function Home() {
   const paidBillCount = safeDocuments.filter((doc) => doc.is_paid).length;
 
   return (
-    <main className="max-w-xl mx-auto py-12 px-6">
+    <main className="max-w-2xl w-full mx-auto py-12 px-6">
       <MainShell
         visibleDocuments={visibleDocuments}
         totalUnpaidAmount={totalUnpaidAmount}

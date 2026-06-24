@@ -21,7 +21,7 @@ export default function MainShell({
 }: MainShellProps) {
   const [currentView, setCurrentView] = useState<"desk" | "vault">("desk");
   return (
-    <div className="w-full overflow-x-hidden pb-28">
+    <div className="w-full overflow-x-hidden max-w-2xl pb-28">
       {currentView === "desk" ? (
         <DeskView
           visibleDocuments={visibleDocuments}
@@ -30,9 +30,7 @@ export default function MainShell({
           paidBillCount={paidBillCount}
         />
       ) : (
-        <div className="text-center py-20 text-slate-400 font-mono text-lg">
-          <VaultView documents={visibleDocuments} />
-        </div>
+        <VaultView documents={visibleDocuments} />
       )}
 
       <NaviDock currentView={currentView} setView={setCurrentView} />
