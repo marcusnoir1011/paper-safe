@@ -32,7 +32,7 @@ export default function DeskView({
       </header>
 
       <section className="space-y-1.5 px-1 text-center">
-        <h1 className="t font-sans text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="font-sans text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
           Welcome back to Paper Safe
         </h1>
         <p className="font-mono text-xs md:text-sm font-medium text-muted tracking-tight leading-relaxed">

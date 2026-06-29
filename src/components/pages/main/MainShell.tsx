@@ -7,6 +7,7 @@ import DeskView from "./DeskView";
 import VaultView from "./VaultView";
 
 interface MainShellProps {
+  allDocuemnts: any[];
   visibleDocuments: any[];
   totalUnpaidAmount: number;
   overBillsCount: number;
@@ -14,6 +15,7 @@ interface MainShellProps {
 }
 
 export default function MainShell({
+  allDocuemnts,
   visibleDocuments,
   totalUnpaidAmount,
   overBillsCount,
@@ -30,7 +32,7 @@ export default function MainShell({
           paidBillCount={paidBillCount}
         />
       ) : (
-        <VaultView documents={visibleDocuments} />
+        <VaultView documents={allDocuemnts} />
       )}
 
       <NaviDock currentView={currentView} setView={setCurrentView} />

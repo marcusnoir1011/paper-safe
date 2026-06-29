@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { X, CheckCircle2 } from "lucide-react";
 
 import { supabase } from "@/lib/client";
-import toast from "react-hot-toast/headless";
+import toast from "react-hot-toast";
 
 export default function EditDoc({ document }: { document: any }) {
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isPaid, setIsPaid] = useState(document.is_paid);
 
   useEffect(() => {
@@ -21,7 +22,6 @@ export default function EditDoc({ document }: { document: any }) {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-
     const rawDueDate = formData.get("due_date");
     const cleanDueDate = rawDueDate && rawDueDate !== "" ? rawDueDate : null;
 
@@ -35,7 +35,7 @@ export default function EditDoc({ document }: { document: any }) {
       .eq("id", document.id);
 
     if (error) {
-      toast.error(error?.message);
+      toast.error(error?.message || "Could not save changes.");
     } else {
       toast.success("Successfully Edited!");
       setIsOpen(false);
@@ -44,29 +44,31 @@ export default function EditDoc({ document }: { document: any }) {
   };
 
   const handleRemove = async () => {
-    const confirmed = window.confirm(
-      "Remove this document from your Desk? (Your total statistics and spending insights will be kept accurate.)",
-    );
+    setIsConfirmModalOpen(true);
+  };
 
-    if (!confirmed) return;
-
+  const removeDoc = async () => {
     const { error } = await supabase
       .from("documents")
       .update({ is_visible: false })
       .eq("id", document.id);
 
     if (error) {
-      toast.error(error?.message || "Could not remove the document.");
+      toast.error(error?.message || "Could not delete the document(s).");
     } else {
+      toast.success("Document have been removed from the Desk.");
+      setIsConfirmModalOpen(false);
       setIsOpen(false);
-      toast.success("Document removed from Desk.");
       router.refresh();
     }
+
+    setIsConfirmModalOpen(false);
   };
 
   return (
     <>
       <button
+        type="button"
         onClick={() => setIsOpen(true)}
         className="px-4 py-2 text-sm md:text-md font-sans font-bold text-slate-600 bg-surface border border-border-mid rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-all shadow-md active:scale-95"
       >
@@ -78,7 +80,9 @@ export default function EditDoc({ document }: { document: any }) {
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+            }}
           />
 
           {/* Window */}
@@ -151,6 +155,7 @@ export default function EditDoc({ document }: { document: any }) {
 
               <div className="pt-2">
                 <button
+                  type="button"
                   onClick={handleRemove}
                   className="w-full px-4 py-2 h-10 text-xs font-bold font-sans text-red-600 bg-red-300 rounded-xl shadow-sm transition-colors uppercase tracking-wider text-center active:scale-[0.99]"
                 >
@@ -175,6 +180,41 @@ export default function EditDoc({ document }: { document: any }) {
               </div>
             </form>
           </div>
+
+          {isConfirmModalOpen && (
+            <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+              <div
+                className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+                onClick={() => setIsConfirmModalOpen(false)}
+              />
+
+              <div className="relative bg-surface rounded-2xl shadow-2xl w-[90%] sm:max-w-sm border border-border-light p-6 z-70 text-left">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-tigher">
+                  Confirm Removal
+                </h3>
+                <p className="text-sm font-medium text-slate-500 leading-relaxed">
+                  Remove this document from your desk?
+                </p>
+
+                <div className="flex gap-3 pt-5">
+                  <button
+                    type="button"
+                    onClick={() => setIsConfirmModalOpen(false)}
+                    className="flex-1 px-3 py-2 text-sm font-bold border border-border-mid text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors uppercase tracking-wider text-center"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={removeDoc}
+                    className="flex-1 px-3 py-2 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors uppercase tracking-wider text-center"
+                  >
+                    Yes, Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>

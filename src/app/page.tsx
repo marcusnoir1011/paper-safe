@@ -78,6 +78,7 @@ export default async function Home() {
   return (
     <main className="max-w-2xl w-full mx-auto py-12 px-6">
       <MainShell
+        allDocuemnts={docsWithUrls}
         visibleDocuments={visibleDocuments}
         totalUnpaidAmount={totalUnpaidAmount}
         overBillsCount={overBillsCount}

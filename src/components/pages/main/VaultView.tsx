@@ -32,7 +32,7 @@ export default function VaultView({ documents }: VaultViewProps) {
 
   filteredDocs.forEach((doc) => {
     let year = "unsorted";
-    let month = "no Date";
+    let month = "No Date";
 
     if (doc.due_date) {
       const dateObj = new Date(doc.due_date);
