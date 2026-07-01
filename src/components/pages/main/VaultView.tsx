@@ -11,12 +11,16 @@ import {
   FileText,
 } from "lucide-react";
 import DocumentList from "@/components/ui/DocumentList";
+import { supabase } from "@/lib/client";
+import { handler } from "next/dist/server/route-modules/pages/builtin/_error";
 
 interface VaultViewProps {
   documents: any[];
 }
 
 export default function VaultView({ documents }: VaultViewProps) {
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>(
     {},
@@ -62,6 +66,19 @@ export default function VaultView({ documents }: VaultViewProps) {
       [yearMonthKey]: !prev[yearMonthKey],
     }));
   };
+
+  // bulk delete
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
+  };
+  const bulkDelete = async () => {
+    const { error } = await supabase
+      .from("documents")
+      .delete()
+      .in("id", selectedIds);
+  };
   return (
     <div className="space-y-8">
       <section className="space-y-1 px-1">
@@ -82,7 +99,7 @@ export default function VaultView({ documents }: VaultViewProps) {
           placeholder="Search files by title..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-surface border border-border-light rounded-xl font-sans text-left pl-11 text-sm font-medium p-2 shadow-sm outline-none focus:border-accent transition-colors"
+          className="w-full bg-surface border border-slate-500 rounded-xl font-sans text-left pl-11 text-sm font-medium p-2 shadow-md outline-none focus:border-accent transition-colors"
         />
       </section>
 
@@ -91,6 +108,46 @@ export default function VaultView({ documents }: VaultViewProps) {
           No matching documents found.
         </div>
       )}
+
+      <section className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border border-border-light p-4 rounded-2xl">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => {
+              setIsSelectionMode(!isSelectionMode);
+              setSelectedIds([]);
+            }}
+            className={`
+              px-4 py-2 text-md font-sans font-bold border rounded-lg shadow-sm transition-all active:scale-95 ${
+                isSelectionMode
+                  ? "bg-slate-900 border-slate-950 text-white hover:bg-slate-800"
+                  : "bg-surface border-border-mid text-slate-600 hover:bg-slate-50"
+              }
+              `}
+          >
+            {isSelectionMode ? "Cancel" : "Select Items"}
+          </button>
+          <div>
+            {isSelectionMode ? (
+              <div className="space-x-2">
+                <span className="font-mono font-medium text-sm">
+                  {selectedIds.length} SELECTED
+                </span>
+                <button
+                  type="button"
+                  onClick={bulkDelete}
+                  className="px-4 py-2 text-md font-bold text-red-600 border border-red-500 bg-white hover:bg-red-600 hover:text-white disabled:bg-red-300 disabled:cursor-not-allowed rounded-lg shadow-sm transition-all"
+                >
+                  Delete
+                </button>
+              </div>
+            ) : (
+              <p className="font-mono text-xs font-bole text-muted uppercase tracking-wider">
+                Viewing Archive
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       <section className="space-y-8">
         {sortedYears.map((year) => (
@@ -137,8 +194,13 @@ export default function VaultView({ documents }: VaultViewProps) {
 
                     {/* Smooth expansion of matching Documents rows */}
                     {isExpanded && (
-                      <div className="pl-2 animate-fade-in">
-                        <DocumentList documents={timelineGroups[year][month]} />
+                      <div className="animate-fade-in">
+                        <DocumentList
+                          documents={timelineGroups[year][month]}
+                          hasMode={isSelectionMode}
+                          selectedIds={selectedIds}
+                          onToggleSelect={handleToggleSelect}
+                        />
                       </div>
                     )}
                   </div>

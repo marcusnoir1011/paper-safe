@@ -2,8 +2,21 @@ import { Calendar, ChevronRight, FileText } from "lucide-react";
 
 import { ImagePreview } from "./ImagePreveiw";
 import EditDoc from "./EditDoc";
+import { text } from "stream/consumers";
 
-export default function DocumentList({ documents }: { documents: any[] }) {
+interface DocumentListProps {
+  documents: any[];
+  hasMode?: boolean;
+  selectedIds?: string[];
+  onToggleSelect?: (id: string) => void;
+}
+
+export default function DocumentList({
+  documents,
+  hasMode = false,
+  selectedIds = [],
+  onToggleSelect,
+}: DocumentListProps) {
   if (!documents || documents.length === 0)
     return (
       <div className="text-center px-2 py-20 border-2 border-dashed border-border-mid rounded-3xl bg-surface/50">
@@ -18,74 +31,97 @@ export default function DocumentList({ documents }: { documents: any[] }) {
         </p>
       </div>
     );
-
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between px-2">
         <span className="font-mono text-sm font-bold uppercase tradking widest text-muted">
-          Recent Docuemnts
+          Documents
         </span>
         <span className="font-mono text-sm font-bold text-ink bg-slate-100 px-2 py-1 rounded-lg border border-border-mid shadow-md">
           {documents.length} Items
         </span>
       </div>
 
-      {documents.map((doc) => (
-        <div
-          key={doc.id}
-          className="group bg-surface border border-border-light rounded-2xl p-4 shadow-sm hover:border-border-mid hover:shadow-md transition-all flex items-center gap-3"
-        >
-          {/*Thumbnail*/}
-          <div className="relative h-28 w-28 rounded shrink-0 bg-slate-50 border border-border-light overflow-hidden group-hover:border-border-mid transition-colors">
-            {doc.signedUrl ? (
-              <ImagePreview src={doc.signedUrl} title={doc.title} />
-            ) : (
-              <div className="flex items-center justify-center h-full text-slate-200">
-                <FileText size={24} />
+      {documents.map((doc) => {
+        const isCheck = selectedIds.includes(doc.id);
+        return (
+          <div
+            key={doc.id}
+            onClick={() => hasMode && onToggleSelect?.(doc.id)}
+            className={`group bg-surface border border-border-light rounded-2xl p-4 shadow-sm hover:border-border-mid hover:shadow-md transition-all flex items-center gap-3 relative ${
+              hasMode
+                ? "cursor-pointer select-none border-slate--300"
+                : "border-border-light"
+            } ${isCheck ? "bg-slate-50/70 border-slate-900 shadow-inner" : ""}`}
+          >
+            {hasMode && (
+              <div className="shrink-0 transition-all duration-100">
+                <div
+                  className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${
+                    isCheck
+                      ? "bg-slate-900 border-slate-900 text-white"
+                      : "bg-white border-slate-300"
+                  }`}
+                >
+                  {isCheck && <div className="w-2 h-2 bg-white rounded-xs" />}
+                </div>
               </div>
             )}
-          </div>
 
-          {/*Info Area*/}
-          <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-start mb-1">
-              <h3 className="font-bold text-slate-900 truncate pr-2 text-sm tracking-tight">
-                {doc.title}
-              </h3>
-              <p className="font-bold text-sm text-ink shrink-0">
-                ¥{doc.amount?.toLocaleString() || "0"}
-              </p>
+            {/*Thumbnail*/}
+            <div className="relative h-28 w-28 rounded shrink-0 bg-slate-50 border border-border-light overflow-hidden group-hover:border-border-mid transition-colors">
+              {doc.signedUrl ? (
+                <ImagePreview src={doc.signedUrl} title={doc.title} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-200">
+                  <FileText size={24} />
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 font-mono text-[10px] font-medium text-muted uppercase tracking-tight">
-                <Calendar size={16} className="text-slate-400" />
-                <span>Due: {doc.due_date || "Not Set"}</span>
+            {/*Info Area*/}
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-start mb-1">
+                <h3 className="font-bold text-slate-900 truncate pr-2 text-sm tracking-tight">
+                  {doc.title}
+                </h3>
+                <p className="font-bold text-sm text-ink shrink-0">
+                  ¥{doc.amount?.toLocaleString() || "0"}
+                </p>
               </div>
-              <span
-                className={`
+
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 font-mono text-[10px] font-medium text-muted uppercase tracking-tight">
+                  <Calendar size={16} className="text-slate-400" />
+                  <span>Due: {doc.due_date || "Not Set"}</span>
+                </div>
+                <span
+                  className={`
                 text-xs px-2 py-1 rounded-md font-extrabold uppercase tracking-widest border ${
                   doc.is_paid
                     ? "bg-green-10 text-green-700 border-green-400"
                     : "bg-red-10 text-red-700 border-red-400"
                 }
                 `}
-              >
-                {doc.is_paid ? "Paid" : "Unpaid"}
-              </span>
+                >
+                  {doc.is_paid ? "Paid" : "Unpaid"}
+                </span>
+              </div>
+            </div>
+
+            {/*button*/}
+            <div className="shrink-0 flex items-center gap-3">
+              {!hasMode && <EditDoc document={doc} />}
+              {!hasMode && (
+                <ChevronRight
+                  size={16}
+                  className="text-slate-300 group-hover:text-ink transition-colors"
+                />
+              )}
             </div>
           </div>
-
-          {/*button*/}
-          <div className="shrink-0 flex items-center gap-3">
-            <EditDoc document={doc} />
-            <ChevronRight
-              size={16}
-              className="text-slate-300 group-hover:text-ink transition-colors"
-            />
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
